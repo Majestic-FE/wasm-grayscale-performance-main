@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>image test</title>
+  </head>
+  <body>
+    <h1>JS 画像処理テスト</h1>
+    <div>
+      <img
+        id="image"
+        src="./image/yudai_abe.jpg"
+        alt="安部雄大の顔"
+        style="width: 300px"
+      />
+    </div>
+    <div>
+      <canvas id="canvas" style="width: 300px"></canvas>
+    </div>
+    <div
+      id="performance"
+      style="display: flex; align-items: center; gap: 10px"
+    ></div>
+    <button id="button">グレースケール処理とパフォーマンス測定</button>
+    <script type="module" src="./js/index.js"></script>
+  </body>
+</html>

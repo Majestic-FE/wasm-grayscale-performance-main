@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Hello OpenCV.js</title>
+</head>
+<body>
+<h2>OpenCV.jsで画像処理</h2>
+
+<div>
+  <div class="inputoutput">
+    <img id="imageSrc" src="./yudai_abe.jpg" width="300" alt="No Image" />
+  </div>
+  <div class="inputoutput">
+    <canvas id="canvasOutput" style="width: 300px; height: 400px"></canvas>
+  </div>
+  <div id="performance" style="display: flex; align-items: center; gap: 10px"></div>
+
+  <form name="test">
+    <input id="button" type="button" value="grayscale">
+    <br>
+  </form>
+  <br>
+  <p id="status">OpenCV.js is loading...</p>
+</div>
+<script type="text/javascript">
+  const button = document.getElementById("button");
+const imgElement = document.getElementById('imageSrc');
+const performanceBlock = document.getElementById("performance");
+const averageUI = document.createElement("h2");
+const standardDeviationUI = document.createElement("h2");
+
+const canvas = document.getElementById("canvasOutput");
+const ctx = canvas.getContext("2d");
+const [width, height] = [canvas.width, canvas.height];
+
+const array = [];
+let total = 0;
+let average = 0;
+let count = 0;
+
+button.addEventListener("click", (e)  => {
+  e.preventDefault();
+  count += 1;
+  performanceBlock.appendChild(averageUI);
+  performanceBlock.appendChild(standardDeviationUI);
+  grayscale()
+})
+
+function grayscale() {
+  const img = new Image();
+  img.src = "./yudai_abe.jpg";
+  img.crossOrigin = "anonymous";
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, width, height);
+
+    const startTime = performance.now();
+    let mat = cv.imread(img);
+    let dst = new cv.Mat();
+    cv.cvtColor(mat, dst, cv.COLOR_RGBA2GRAY, 0);
+    cv.imshow('canvasOutput', dst);
+    const endTime = performance.now();
+    console.log(`${count}回目の時間`, endTime - startTime, average);
+
+    mat.delete();
+    dst.delete();
+    onPerformance(startTime, endTime);
+    onDrawing();
+  }
+}
+
+function onPerformance(start, end) {
+  const performance = end - start;
+  total += performance;
+  array.push(performance);
+  average = total / count;
+}
+
+function onDrawing() {
+  const standardDeviation = fetchStandardDeviation();
+  averageUI.innerHTML = total / count;
+  standardDeviationUI.innerHTML = standardDeviation;
+}
+
+function onOpenCvReady() {
+  document.getElementById('status').innerHTML = 'OpenCV.js is ready.';
+}
+
+function fetchStandardDeviation() {
+  const standardDeviation = Math.sqrt(
+    array
+      .map((current) => {
+        // 各要素について
+        let difference = current - average; // 平均値との差を求める
+        return difference ** 2; // 差を2乘する
+      })
+      .reduce(
+        (previous, current) => previous + current // 差の2乗をすべて足す
+      ) / count // 差の2乗の平均が分散
+  );
+
+  return standardDeviation;
+}
+</script>
+<script async src=".\opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
+</body>
+</html>
